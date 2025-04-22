@@ -16,11 +16,10 @@ This system uses Dlib, and facial landmark detection to monitor your face for si
 ### Steps
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/projectname.git
-    ```
+https://github.com/ahmedsoliemaan1/Face-Detection-and-Alert-System/tree/master    ```
 2. Navigate to the project directory:
     ```bash
-    cd projectname
+    cd Face detection
     ```
 3. Install the dependencies:
     ```bash
