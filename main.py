@@ -1,3 +1,4 @@
+
 import cv2
 import numpy as np
 import dlib
@@ -21,13 +22,13 @@ status = ""
 color = (0, 0, 0)
 last_sleep_time = 0
 last_drowsy_time = 0
-alarm_duration = 10  # Time in seconds to trigger alarm when in "Drowsy" or "Sleeping" state
+alarm_duration = 10  #when in "Drowsy" or "Sleeping" state, start the Alarm
 
 # CSV file to log the results
-csv_file = "status_log.csv"
+csv_file = "biometric_test.csv"
 with open(csv_file, mode='w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(["Screenshot", "Status", "Timestamp", "Comment"])  # Write headers
+    writer.writerow(["Screenshot", "Status", "Timestamp"])  #headers
 
 # Function to compute Euclidean distance
 def compute(ptA, ptB):
@@ -45,10 +46,10 @@ def blinked(a, b, c, d, e, f):
     else:
         return 0  # Eye closed
 
-def save_to_csv(image_path, status, timestamp, comment):
+def save_to_csv(image_path, status, timestamp):
     with open(csv_file, mode='a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([image_path, status, timestamp, comment])
+        writer.writerow([image_path, status, timestamp])
 
 while True:
     ret, frame = cap.read()
@@ -77,15 +78,15 @@ while True:
             if sleep > 6:
                 status = "SLEEPING !!!"
                 color = (255, 0, 0)
-                winsound.Beep(1000, 1000)  # Sound alert for sleep
                 current_time = time.time()
                 if current_time - last_sleep_time >= alarm_duration:
-                    # Save screenshot
-                    timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+                    timestamp = time.strftime('%Y-%m-%d_%H-%M-%S')
+                    csv_timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
                     screenshot_path = f"screenshots/sleeping_{timestamp}.png"
-                    cv2.imwrite(screenshot_path, frame)  # Save the screenshot
-                    save_to_csv(screenshot_path, status, timestamp, "You are sleeping. Be careful!")
-                    last_sleep_time = current_time  # Reset the sleep time timer
+                    cv2.imwrite(screenshot_path, frame)
+                    save_to_csv(screenshot_path, status, csv_timestamp)
+                    winsound.Beep(1000, 1000)
+                    last_sleep_time = current_time
 
         elif left_blink == 1 or right_blink == 1:
             sleep = 0
@@ -94,15 +95,15 @@ while True:
             if drowsy > 6:
                 status = "Drowsy !"
                 color = (0, 0, 255)
-                winsound.Beep(500, 1000)  # Sound alert for drowsy
                 current_time = time.time()
                 if current_time - last_drowsy_time >= alarm_duration:
-                    # Save screenshot
-                    timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+                    timestamp = time.strftime('%Y-%m-%d_%H-%M-%S')
+                    csv_timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
                     screenshot_path = f"screenshots/drowsy_{timestamp}.png"
-                    cv2.imwrite(screenshot_path, frame)  # Save the screenshot
-                    save_to_csv(screenshot_path, status, timestamp, "You're drowsy. Take a break!")
-                    last_drowsy_time = current_time  # Reset the drowsy time timer
+                    cv2.imwrite(screenshot_path, frame)
+                    save_to_csv(screenshot_path, status, csv_timestamp)
+                    winsound.Beep(500, 1000)
+                    last_drowsy_time = current_time
 
         else:
             drowsy = 0
