@@ -6,6 +6,17 @@ from imutils import face_utils
 import csv
 import time
 import winsound  # Sound alert for drowsy or sleeping
+import platform
+import os
+
+# Sound alert cross-platform
+def play_beep(frequency=1000, duration=1000):
+    if platform.system() == "Windows":
+        import winsound
+        winsound.Beep(frequency, duration)
+    else:
+        # Use 'beep' or 'sox' (play) on Linux/macOS
+        os.system(f'play -nq -t alsa synth {duration/1000} sine {frequency}')
 
 # Initialize the webcam
 cap = cv2.VideoCapture(0)
@@ -75,7 +86,7 @@ while True:
             sleep += 1
             drowsy = 0
             active = 0
-            if sleep > 6:
+            if sleep > 10:
                 status = "SLEEPING !!!"
                 color = (255, 0, 0)
                 current_time = time.time()
@@ -85,14 +96,14 @@ while True:
                     screenshot_path = f"screenshots/sleeping_{timestamp}.png"
                     cv2.imwrite(screenshot_path, frame)
                     save_to_csv(screenshot_path, status, csv_timestamp)
-                    winsound.Beep(1000, 1000)
+                    play_beep(1000, 1000)
                     last_sleep_time = current_time
 
         elif left_blink == 1 or right_blink == 1:
             sleep = 0
             active = 0
             drowsy += 1
-            if drowsy > 6:
+            if drowsy > 10:
                 status = "Drowsy !"
                 color = (0, 0, 255)
                 current_time = time.time()
@@ -102,7 +113,7 @@ while True:
                     screenshot_path = f"screenshots/drowsy_{timestamp}.png"
                     cv2.imwrite(screenshot_path, frame)
                     save_to_csv(screenshot_path, status, csv_timestamp)
-                    winsound.Beep(500, 1000)
+                    play_beep(500, 1000)
                     last_drowsy_time = current_time
 
         else:
